@@ -39,6 +39,8 @@ public class UserApiProviderTests {
 //        System.out.println("userAPIProvider.updateUser(userIdToUpdate, dataToUpdate) = " + userAPIProvider.updateUser(userIdToUpdate, Collections.emptyMap()));
         System.out.println("userAPIProvider.getUser(userIdToUpdate) = " + userAPIProvider.getUser(userIdToUpdate));
 
-
+        // Delete user
+        System.out.println("userAPIProvider.deleteUser(1) = " + userAPIProvider.deleteUser(1));
+        System.out.println("userAPIProvider.deleteUser(99) = " + userAPIProvider.deleteUser(99));
     }
 }

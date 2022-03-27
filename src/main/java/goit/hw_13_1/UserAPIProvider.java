@@ -48,7 +48,6 @@ public class UserAPIProvider implements UserAPIProviderInterface {
             throw new IllegalArgumentException("Data cannot be empty");
         }
         String requestData = gson.toJson(data);
-        System.out.println("requestData = " + requestData);
 
         HttpRequest request = HttpRequest
                 .newBuilder(URI.create(USER_API_URL + "/" + userId))
@@ -72,7 +71,20 @@ public class UserAPIProvider implements UserAPIProviderInterface {
     }
 
     @Override
-    public boolean deleteUser(int userId) {
+    public boolean deleteUser(int userId)
+    {
+        HttpRequest request = HttpRequest
+                .newBuilder(URI.create(USER_API_URL + "/" + userId))
+                .DELETE()
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return isResponseCode2xx(response.statusCode());
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
@@ -91,9 +103,7 @@ public class UserAPIProvider implements UserAPIProviderInterface {
 
                 return gson.<ArrayList<User>>fromJson(response.body(), arrayListType);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
