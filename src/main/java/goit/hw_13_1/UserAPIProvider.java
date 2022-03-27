@@ -10,7 +10,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserAPIProvider implements UserAPIProviderInterface {
     private static final String USER_API_URL = "https://jsonplaceholder.typicode.com/users";
@@ -19,7 +21,28 @@ public class UserAPIProvider implements UserAPIProviderInterface {
 
     @Override
     public int createUser(User user) {
-        return 0;
+        String requestBody = gson.toJson(user);
+
+        HttpRequest httpRequest = HttpRequest
+                .newBuilder(URI.create(USER_API_URL))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (isResponseCode2xx(response.statusCode())) {
+                Type type = new TypeToken<HashMap<String, String>>() {}.getType();
+                Map<String, String> body = gson.fromJson(response.body(), type);
+
+                return Integer.parseInt(body.get("id"));
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
     }
 
     @Override
@@ -42,7 +65,8 @@ public class UserAPIProvider implements UserAPIProviderInterface {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (isResponseCode2xx(response.statusCode())) {
-                Type arrayListType = new TypeToken<ArrayList<User>>() {}.getType();
+                Type arrayListType = new TypeToken<ArrayList<User>>() {
+                }.getType();
 
                 return gson.<ArrayList<User>>fromJson(response.body(), arrayListType);
             }
@@ -85,7 +109,8 @@ public class UserAPIProvider implements UserAPIProviderInterface {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (isResponseCode2xx(response.statusCode())) {
-                Type arrayListType = new TypeToken<ArrayList<User>>() {}.getType();
+                Type arrayListType = new TypeToken<ArrayList<User>>() {
+                }.getType();
                 List<User> users = gson.<ArrayList<User>>fromJson(response.body(), arrayListType);
 
                 return users.isEmpty() ? null : users.get(0);
