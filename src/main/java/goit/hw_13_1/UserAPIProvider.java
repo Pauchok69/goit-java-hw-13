@@ -42,10 +42,9 @@ public class UserAPIProvider implements UserAPIProviderInterface {
             HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (isResponseCode2xx(response.statusCode())) {
-                Type fooType = new TypeToken<ArrayList<User>>() {
-                }.getType();
+                Type arrayListType = new TypeToken<ArrayList<User>>() {}.getType();
 
-                return gson.<ArrayList<User>>fromJson(response.body(), fooType);
+                return gson.<ArrayList<User>>fromJson(response.body(), arrayListType);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,9 +67,7 @@ public class UserAPIProvider implements UserAPIProviderInterface {
             if (isResponseCode2xx(response.statusCode())) {
                 return gson.fromJson(response.body(), User.class);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
 
@@ -79,6 +76,24 @@ public class UserAPIProvider implements UserAPIProviderInterface {
 
     @Override
     public User getUserByUsername(String username) {
+        HttpRequest httpRequest = HttpRequest
+                .newBuilder(URI.create(USER_API_URL + "?username=" + username))
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (isResponseCode2xx(response.statusCode())) {
+                Type arrayListType = new TypeToken<ArrayList<User>>() {}.getType();
+                List<User> users = gson.<ArrayList<User>>fromJson(response.body(), arrayListType);
+
+                return users.isEmpty() ? null : users.get(0);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
