@@ -1,11 +1,12 @@
 package goit.hw_13_1;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserAPIProviderInterface {
     int createUser(User user);
 
-    void updateUser(User user);
+    Map<String, Object> updateUser(int userId, Map<String, Object> data);
 
     boolean deleteUser(int userId);
 

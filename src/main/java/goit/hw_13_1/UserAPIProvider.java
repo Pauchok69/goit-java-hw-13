@@ -9,10 +9,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserAPIProvider implements UserAPIProviderInterface {
     private static final String USER_API_URL = "https://jsonplaceholder.typicode.com/users";
@@ -46,8 +43,32 @@ public class UserAPIProvider implements UserAPIProviderInterface {
     }
 
     @Override
-    public void updateUser(User user) {
+    public Map<String, Object> updateUser(int userId, Map<String, Object> data) {
+        if (data.isEmpty()) {
+            throw new IllegalArgumentException("Data cannot be empty");
+        }
+        String requestData = gson.toJson(data);
+        System.out.println("requestData = " + requestData);
 
+        HttpRequest request = HttpRequest
+                .newBuilder(URI.create(USER_API_URL + "/" + userId))
+                .setHeader("Content-Type", "application/json")
+                .PUT(HttpRequest.BodyPublishers.ofString(requestData))
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (isResponseCode2xx(response.statusCode())) {
+                Type type = new TypeToken<Map<String, Object>>() {}.getType();
+
+                return gson.fromJson(response.body(), type);
+            }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyMap();
     }
 
     @Override
