@@ -100,3 +100,4 @@ fabric.properties
 .ipr
 target
 .DS_STORE /src/main/resources/log
+/src/main/java/goit/hw_13_2/files/*
